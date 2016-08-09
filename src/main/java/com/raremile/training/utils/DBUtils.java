@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.raremile.training.exceptions.FatalException;
+
 public class DBUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(DBUtils.class);
 
@@ -32,6 +34,7 @@ public class DBUtils {
 			connection = DriverManager.getConnection("jdbc:mysql://localhost/" + DBName + "?user=root");
 		} catch (SQLException e) {
 			LOG.error("Failed to get a connection", e);
+			throw new FatalException("Please check the DB name");
 		}
 		return connection;
 	}
