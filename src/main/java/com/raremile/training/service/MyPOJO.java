@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.raremile.training.exceptions.NonFatalException;
+import com.raremile.training.io.FileOperations;
 import com.raremile.training.utils.DBUtils;
 
 public class MyPOJO {
@@ -23,11 +24,13 @@ public class MyPOJO {
 
 	private List<String> tableList;
 	private List<String> tableFieldsList;
+	private List<String> tableFieldTypeList;
 
 	public MyPOJO(String DBName) {
 		this.DBName = DBName;
 		this.tableList = new ArrayList<String>();
 		this.tableFieldsList = new ArrayList<String>();
+		this.tableFieldTypeList = new ArrayList<String>();
 	}
 
 	public String getDBName() {
@@ -68,9 +71,23 @@ public class MyPOJO {
 			e.printStackTrace();
 		}
 
-		printList(tableList);
+		// printList(tableList);
 
-		tableFieldsList = getTableFieldNames();
+		for (String tableName : tableList) {
+			try {
+				getTableFieldProperties(tableName);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			// printList(tableFieldsList);
+			// printTable(tableFieldsList, tableFieldTypeList);
+
+			FileOperations.createPOJOClass(tableName, tableFieldTypeList, tableFieldsList);
+			tableFieldsList.clear();
+			tableFieldTypeList.clear();
+
+		}
 
 	}
 
@@ -89,13 +106,29 @@ public class MyPOJO {
 		return tableList;
 	}
 
-	private List<String> getTableFieldNames() {
-		return tableFieldsList;
+	private void getTableFieldProperties(String tableName) throws SQLException {
+		String tableField = "";
+		String tableFieldType = "";
+		resultSet = getMetadata().getColumns(getDBName(), null, tableName, "%");
+
+		while (resultSet.next()) {
+			tableField = resultSet.getString(4);
+			tableFieldType = resultSet.getString(6);
+			tableFieldsList.add(tableField);
+			tableFieldTypeList.add(tableFieldType);
+		}
+
 	}
 
 	void printList(List<String> list) {
 		for (String tableName : list) {
 			System.out.println(tableName);
+		}
+	}
+
+	void printTable(List<String> tableFieldsList, List<String> tableFieldTypeList) {
+		for (int i = 0; i < tableFieldsList.size(); i++) {
+			System.out.println(tableFieldTypeList.get(i) + " " + tableFieldsList.get(i));
 		}
 	}
 

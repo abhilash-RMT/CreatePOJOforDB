@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.raremile.training.exceptions.NonFatalException;
 import com.raremile.training.service.MyPOJO;
+import com.raremile.training.utils.CamelCaseFormatter;
 
 public class App {
 	private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -18,6 +19,7 @@ public class App {
 		} catch (NonFatalException e) {
 			e.printStackTrace();
 		}
+
 	}
 
 }
